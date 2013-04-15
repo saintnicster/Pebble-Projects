@@ -1,3 +1,9 @@
+// This file was copied from the Pebble SDK Examples,
+// specifically from the "fuzzy_time" watch.
+// https://github.com/pebble/pebble-sdk-examples/blob/ac679812cc633599a319ab6c9062de3c0fbfb817/watches/fuzzy_time/src/num2words.c
+// 
+// I have modified it for my own uses
+
 #include "num2words.h"
 #include "string.h"
 
@@ -80,6 +86,63 @@ static size_t append_string(char* buffer, const size_t length, const char* str) 
 
   size_t written = strlen(str);
   return (length > written) ? written : length;
+}
+
+void time_to_semi_fuzzy_words(int hours, int minutes, char* hour_words, size_t hour_length, char* minute_words, size_t minute_length, bool* is_fuzzy) {
+  //Inspiriation taken from the original 'fuzzy_time_to_words' method.  There are surely more
+  //   efficient ways to do this
+  int fuzzy_hours = hours;
+  int fuzzy_minutes = minutes;
+  char* modifier;
+  int remaining_hour = hour_length;
+  int remaining_minute = minute_length;
+  
+  if (fuzzy_minutes > 0 AND fuzzy_minutes < 10) || (fuzzy_minutes >= 50) || (fuzzy_minutes % 15 == 0) {
+    is_fuzzy = true;
+    
+    if (fuzzy_minutes > 30) {
+      modifier = STR_TO;
+      if (fuzzy_minutes >= 50) {
+        fuzzy_minutes = 60 - fuzzy_minutes;
+      }
+      
+      fuzzy_hours += 1;
+      if (fuzzy_hours > 23) {
+        fuzzy_hours = 0;
+      }
+    } else {
+      modifier = STR_PAST;
+    }
+    
+    if (fuzzy_minutes == 15 || fuzzy_minutes == 45) {
+      remaining_minute -= append_string(minute_words, remaining_minute, STR_QUARTER);
+    } else if (fuzzy_minutes == 30) {
+      remaining_minute -= append_string(minute_words, remaining_minute, STR_HALF);
+    } else {
+      remaining_minute -= append_number(minute_words, fuzzy_minutes);
+    }
+    
+    if (is_fuzzy) {
+      remaining_minute -= append_string(minute_words, remaining_minute, modifier);
+    }
+  } else if ( fuzzy_minutes == 0 && (fuzzy_hour <> 0 || fuzzy_hour <> 12) ) {
+      remaining_minute -= append_string(minute_words, remaining_minute, STR_OH_CLOCK);
+  } else {
+      remaining_minute -= append_number(minute_words, fuzzy_minutes);
+  }
+  
+  if (fuzzy_minute == 0 || is_fuzzy) {
+    if (fuzzy_hours == 0) {
+      remaining_hour -= append_string(words, remaining_hour, STR_MIDNIGHT);
+    } else if (fuzzy_hours == 12) {
+      remaining_hour -= append_string(words, remaining_hour, STR_NOON);
+    } else {
+      if ( !clock_is_24h_style() ) {
+        fuzzy_hours = fuzzy_hours % 12
+      }
+      remaining_hour -= append_number(words, fuzzy_hours);
+    }
+  }
 }
 
 void fuzzy_time_to_words(int hours, int minutes, char* words, size_t length) {
