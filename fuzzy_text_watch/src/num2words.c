@@ -51,7 +51,7 @@ static const char* STR_OH_CLOCK = "o'clock";
 static const char* STR_NOON = "noon";
 static const char* STR_MIDNIGHT = "midnight";
 static const char* STR_QUARTER = "quarter";
-static const char* STR_TO = "to";
+static const char* STR_TO = "til";
 static const char* STR_PAST = "past";
 static const char* STR_HALF = "half";
 static const char* STR_AFTER = "after";
@@ -89,39 +89,38 @@ static size_t append_string(char* buffer, const size_t length, const char* str) 
   return (length > written) ? written : length;
 }
 
-void time_to_semi_fuzzy_words(int hours, int minutes, char* hour_words, size_t hour_length, char* minute_words, size_t minute_length, int *is_fuzzy) {
-  //Inspiriation taken from the original 'fuzzy_time_to_words' method.  
+int time_to_semi_fuzzy_words(int hours, int minutes, char* hour_words, size_t hour_length, char* minute_words, size_t minute_length) {
+  //Inspiration taken from the original 'fuzzy_time_to_words' method.
   //  There are surely more efficient ways to do this
   int fuzzy_hours = hours;
   int fuzzy_minutes = minutes;
+  int is_fuzzy = 0;
+  int modifier_length = minute_length;
 
   memset(hour_words, 0, hour_length);
   memset(minute_words, 0, minute_length);
 
-  char* modifier = "";
-  int remaining_hour = hour_length;
-  int remaining_minute = minute_length;
-  *is_fuzzy = 0;
-  
+  char modifier[modifier_length];
+  size_t remaining_hour = hour_length;
+  size_t remaining_minute = minute_length;
+
   if ( (fuzzy_minutes > 0 && fuzzy_minutes < 10) || (fuzzy_minutes >= 50) || (fuzzy_minutes % 15 == 0) ) {
-    *is_fuzzy = 1;
-    
+    is_fuzzy = 1;
+
     if (fuzzy_minutes > 30) {
-      append_string(modifier, minute_length, STR_TO);
-      append_string(modifier, minute_length, " ");
+      modifier_length -= append_string(modifier, minute_length, STR_TO);
       if (fuzzy_minutes >= 50) {
         fuzzy_minutes = 60 - fuzzy_minutes;
       }
-      
+
       fuzzy_hours += 1;
       if (fuzzy_hours > 23) {
         fuzzy_hours = 0;
       }
     } else {
-      append_string(modifier, minute_length, STR_PAST);
-      append_string(modifier, minute_length, " ");
+        modifier_length -= append_string(modifier, minute_length, STR_PAST);
     }
-    
+
     if (fuzzy_minutes == 15 || fuzzy_minutes == 45) {
       remaining_minute -= append_string(minute_words, remaining_minute, STR_QUARTER);
     } else if (fuzzy_minutes == 30) {
@@ -129,8 +128,9 @@ void time_to_semi_fuzzy_words(int hours, int minutes, char* hour_words, size_t h
     } else {
       remaining_minute -= append_number(minute_words, fuzzy_minutes);
     }
-    
+
     if (is_fuzzy) {
+      remaining_minute -= append_string(minute_words, remaining_minute, " ");
       remaining_minute -= append_string(minute_words, remaining_minute, modifier);
     }
   } else if ( fuzzy_minutes == 0 && (fuzzy_hours != 0 || fuzzy_hours != 12) ) {
@@ -148,7 +148,7 @@ void time_to_semi_fuzzy_words(int hours, int minutes, char* hour_words, size_t h
       } else {
         remaining_hour -= append_number(hour_words, fuzzy_hours);
       }
-  
+  return is_fuzzy;
 }
 
       /*
@@ -158,7 +158,7 @@ void time_to_semi_fuzzy_words(int hours, int minutes, char* hour_words, size_t h
         remaining_hour -= append_string(hour_words, remaining_hour, STR_MIDNIGHT);
       } else if (fuzzy_hours == 12) {
         remaining_hour -= append_string(hour_words, remaining_hour, STR_NOON);
-      } 
+      }
     }
   }
   if (!hour_words) {

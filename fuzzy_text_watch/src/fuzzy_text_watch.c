@@ -37,8 +37,8 @@ static void light_layer(TextLayer* light_layer) {
 }
 
 static void update_time(PblTm* t) {
-  char* hour_words = "hour"; char* minute_words = "minute"; int is_fuzzy = 0;
-  time_to_semi_fuzzy_words(t->tm_hour, t->tm_min, hour_words, BUFFER_SIZE, minute_words, BUFFER_SIZE, &is_fuzzy);
+  char hour_words[BUFFER_SIZE]; char minute_words[BUFFER_SIZE]; int is_fuzzy = 0;
+  is_fuzzy = time_to_semi_fuzzy_words(t->tm_hour, t->tm_min, hour_words, BUFFER_SIZE, minute_words, BUFFER_SIZE);
 
   if (is_fuzzy) {
     light_layer(&s_data.label1);
