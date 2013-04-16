@@ -6,6 +6,7 @@
 
 #include "num2words.h"
 #include "string.h"
+#include "pebble_os.h"
 
 static const char* const ONES[] = {
   "zero",
@@ -20,7 +21,7 @@ static const char* const ONES[] = {
   "nine"
 };
 
-static const char* const TEENS[] ={
+static const char* const TEENS[] = {
   "",
   "eleven",
   "twelve",
@@ -88,20 +89,21 @@ static size_t append_string(char* buffer, const size_t length, const char* str) 
   return (length > written) ? written : length;
 }
 
-void time_to_semi_fuzzy_words(int hours, int minutes, char* hour_words, size_t hour_length, char* minute_words, size_t minute_length, bool* is_fuzzy) {
-  //Inspiriation taken from the original 'fuzzy_time_to_words' method.  There are surely more
-  //   efficient ways to do this
+void time_to_semi_fuzzy_words(int hours, int minutes, char* hour_words, size_t hour_length, char* minute_words, size_t minute_length, int* is_fuzzy) {
+  //Inspiriation taken from the original 'fuzzy_time_to_words' method.  
+  //  There are surely more efficient ways to do this
   int fuzzy_hours = hours;
   int fuzzy_minutes = minutes;
-  char* modifier;
+  char* modifier = "";
   int remaining_hour = hour_length;
   int remaining_minute = minute_length;
+  is_fuzzy = 0;
   
-  if (fuzzy_minutes > 0 AND fuzzy_minutes < 10) || (fuzzy_minutes >= 50) || (fuzzy_minutes % 15 == 0) {
-    is_fuzzy = true;
+  if ( (fuzzy_minutes > 0 && fuzzy_minutes < 10) || (fuzzy_minutes >= 50) || (fuzzy_minutes % 15 == 0) ) {
+    (*is_fuzzy) = 1;
     
     if (fuzzy_minutes > 30) {
-      modifier = STR_TO;
+      append_string(modifier, minute_length, STR_TO);
       if (fuzzy_minutes >= 50) {
         fuzzy_minutes = 60 - fuzzy_minutes;
       }
@@ -111,7 +113,7 @@ void time_to_semi_fuzzy_words(int hours, int minutes, char* hour_words, size_t h
         fuzzy_hours = 0;
       }
     } else {
-      modifier = STR_PAST;
+      append_string(modifier, minute_length, STR_PAST);
     }
     
     if (fuzzy_minutes == 15 || fuzzy_minutes == 45) {
@@ -125,23 +127,23 @@ void time_to_semi_fuzzy_words(int hours, int minutes, char* hour_words, size_t h
     if (is_fuzzy) {
       remaining_minute -= append_string(minute_words, remaining_minute, modifier);
     }
-  } else if ( fuzzy_minutes == 0 && (fuzzy_hour <> 0 || fuzzy_hour <> 12) ) {
+  } else if ( fuzzy_minutes == 0 && (fuzzy_hours != 0 || fuzzy_hours != 12) ) {
       remaining_minute -= append_string(minute_words, remaining_minute, STR_OH_CLOCK);
   } else {
       remaining_minute -= append_number(minute_words, fuzzy_minutes);
   }
   
-  if (fuzzy_minute == 0 || is_fuzzy) {
+  if (fuzzy_minutes == 0 || is_fuzzy) {
     if (fuzzy_hours == 0) {
-      remaining_hour -= append_string(words, remaining_hour, STR_MIDNIGHT);
+      remaining_hour -= append_string(hour_words, remaining_hour, STR_MIDNIGHT);
     } else if (fuzzy_hours == 12) {
-      remaining_hour -= append_string(words, remaining_hour, STR_NOON);
-    } else {
+      remaining_hour -= append_string(hour_words, remaining_hour, STR_NOON);
+    } 
+  } else {
       if ( !clock_is_24h_style() ) {
-        fuzzy_hours = fuzzy_hours % 12
+        fuzzy_hours = fuzzy_hours % 12;
       }
-      remaining_hour -= append_number(words, fuzzy_hours);
-    }
+      remaining_hour -= append_number(hour_words, fuzzy_hours);
   }
 }
 
