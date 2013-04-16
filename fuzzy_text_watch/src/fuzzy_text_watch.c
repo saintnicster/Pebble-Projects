@@ -37,20 +37,21 @@ static void light_layer(TextLayer* light_layer) {
 }
 
 static void update_time(PblTm* t) {
-  char* hour_words = ""; char* minute_words = ""; int *is_fuzzy = 0;
-  time_to_semi_fuzzy_words(t->tm_hour, t->tm_min, hour_words, BUFFER_SIZE, minute_words, BUFFER_SIZE, is_fuzzy);
+  char* hour_words = "hour"; char* minute_words = "minute"; int is_fuzzy = 0;
+  time_to_semi_fuzzy_words(t->tm_hour, t->tm_min, hour_words, BUFFER_SIZE, minute_words, BUFFER_SIZE, &is_fuzzy);
 
   if (is_fuzzy) {
     light_layer(&s_data.label1);
-    text_layer_set_text(&s_data.label1, "FUZZY MIN");
+    text_layer_set_text(&s_data.label1,  minute_words);
     bold_layer(&s_data.label2);
-    text_layer_set_text(&s_data.label2, "FUZZY HOUR!");
+    text_layer_set_text(&s_data.label2, hour_words);
   } else {
+    light_layer(&s_data.label2);
+    text_layer_set_text(&s_data.label2, minute_words);
     bold_layer(&s_data.label1);
     text_layer_set_text(&s_data.label1, hour_words);
-    light_layer(&s_data.label2);
-    text_layer_set_text(&s_data.label2, "MINUTE");
   }
+  
 }
 
 static void handle_minute_tick(AppContextRef app_ctx, PebbleTickEvent* e) {
