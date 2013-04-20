@@ -2,10 +2,15 @@
 {"friendlyVersion": "dev_1.0",
  "versionDefName": "COUNTER_IMAGES",
  "media": [
-	{
+		{
+            "type": "png",
+            "defName": "IMAGE_BUTTON_BAR",
+            "file": "images/button_bar2.png"
+		},
+        {
         "type": "png",
-        "defName": "IMAGE_BUTTON_BAR",
-        "file": "images/button_bar2.png"
-	}
+        "defName": "IMAGE_MENU_ICON",
+        "file": "images/menu_icon.png"
+        }
 	  ]
 }
