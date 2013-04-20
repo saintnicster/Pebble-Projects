@@ -144,14 +144,14 @@ bool time_to_semi_fuzzy_words(int hours, int minutes, char* hour_words, size_t h
       remaining_minute -= append_number(minute_words, fuzzy_minutes);
   }
   
-  if ( !clock_is_24h_style() ) {
+  if ( !clock_is_24h_style() && fuzzy_hours != 12) {
     fuzzy_hours = fuzzy_hours % 12;
   }
   if (fuzzy_hours == 0 && ( is_fuzzy || fuzzy_minutes == 0 ) ) {
     remaining_hour -= append_string(hour_words, remaining_hour, STR_MIDNIGHT);
   } else if (fuzzy_hours == 0) {
     remaining_hour -= append_number(hour_words, 12);
-  } else if (fuzzy_hours == 12 && is_fuzzy) {
+  } else if (fuzzy_hours == 12 && ( is_fuzzy || fuzzy_minutes == 0 ) ){
     remaining_hour -= append_string(hour_words, remaining_hour, STR_NOON);
   } else {
     remaining_hour -= append_number(hour_words, fuzzy_hours);
