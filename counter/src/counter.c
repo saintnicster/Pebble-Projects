@@ -16,11 +16,13 @@ PBL_APP_INFO(MY_UUID,
 Window window;
 
 struct CommonWordsData {
-  bool is_negative;
+  TextLayer counter_label;
   short counter;
   int selected_digit;
 } s_data;
-
+void reset_counter() {
+  s_data.counter = 0;
+}
 void move_pointer() {
   switch (s_data.selected_digit) {
     case ONES_SELECTED:
@@ -35,6 +37,12 @@ void move_pointer() {
   }
 }
 
+void set_counter_label_text() {
+  char counter_text[5];
+  sprintf(counter_text, "%i", s_data.counter);
+  text_layer_set_text(&s_data.counter_label, counter_text);
+}
+
 void decrement_counter(short how_much) {
   s_data.counter -= how_much;
 }
@@ -46,6 +54,8 @@ void up_single_click_handler(ClickRecognizerRef recognizer, Window *window) {
   (void)recognizer;
   (void)window;
 
+  increment_counter(s_data.selected_digit);
+
 }
 
 
@@ -53,13 +63,14 @@ void down_single_click_handler(ClickRecognizerRef recognizer, Window *window) {
   (void)recognizer;
   (void)window;
 
+  decrement_counter(s_data.selected_digit);
 }
 
 void select_single_click_handler(ClickRecognizerRef recognizer, Window *window) {
   (void)recognizer;
   (void)window;
 
-  //text_layer_set_text(&textLayer, "Select!");
+  move_pointer();
 }
 
 
@@ -90,6 +101,10 @@ void handle_init(AppContextRef ctx) {
 
   window_init(&window, "Window Name");
   window_stack_push(&window, true /* Animated */);
+
+  text_layer_init(&s_data.counter_label, GRect(0,0,40,144));
+  text_layer_set_font(&s_data.counter_label, fonts_get_system_font(FONT_KEY_GOTHAM_42_BOLD));
+  layer_add_child(&window.layer, &s_data.counter_label.layer);
 }
 
 
