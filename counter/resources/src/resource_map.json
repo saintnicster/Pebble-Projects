@@ -1,11 +1,11 @@
 
-{"friendlyVersion": "VERSION",
- "versionDefName": "VERSION",
+{"friendlyVersion": "dev_1.0",
+ "versionDefName": "COUNTER_IMAGES",
  "media": [
-	   {
-	    "type":"raw",
-	    "defName":"DUMMY",
-	    "file":"resource_map.json"
-	   }
+	{
+        "type": "png",
+        "defName": "IMAGE_BUTTON_BAR",
+        "file": "images/button_bar2.png"
+	}
 	  ]
 }
