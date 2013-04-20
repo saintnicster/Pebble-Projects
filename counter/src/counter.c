@@ -42,9 +42,51 @@ void increment_counter(short how_much) {
   s_data.counter += how_much;
 }
 
+void up_single_click_handler(ClickRecognizerRef recognizer, Window *window) {
+  (void)recognizer;
+  (void)window;
+
+}
+
+
+void down_single_click_handler(ClickRecognizerRef recognizer, Window *window) {
+  (void)recognizer;
+  (void)window;
+
+}
+
+void select_single_click_handler(ClickRecognizerRef recognizer, Window *window) {
+  (void)recognizer;
+  (void)window;
+
+  //text_layer_set_text(&textLayer, "Select!");
+}
+
+
+void select_long_click_handler(ClickRecognizerRef recognizer, Window *window) {
+  (void)recognizer;
+  (void)window;
+
+
+}
+
+void click_config_provider(ClickConfig **config, Window *window) {
+  (void)window;
+
+  config[BUTTON_ID_SELECT]->click.handler = (ClickHandler) select_single_click_handler;
+
+  config[BUTTON_ID_SELECT]->long_click.handler = (ClickHandler) select_long_click_handler;
+
+  config[BUTTON_ID_UP]->click.handler = (ClickHandler) up_single_click_handler;
+  config[BUTTON_ID_UP]->click.repeat_interval_ms = 100;
+
+  config[BUTTON_ID_DOWN]->click.handler = (ClickHandler) down_single_click_handler;
+  config[BUTTON_ID_DOWN]->click.repeat_interval_ms = 100;
+}
 
 void handle_init(AppContextRef ctx) {
   (void)ctx;
+  window_set_click_config_provider(&window, (ClickConfigProvider) click_config_provider);
 
   window_init(&window, "Window Name");
   window_stack_push(&window, true /* Animated */);

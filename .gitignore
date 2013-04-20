@@ -1,5 +1,9 @@
 *DS_Store
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> Copy button code from template
 # Ignore ignore files
 .hgignore
 .gitignore
@@ -19,5 +23,8 @@ pebble_app.ld
 
 # Ignore other generated files
 serial_dump.txt
+<<<<<<< HEAD
 
 counter/.gitignore
+=======
+>>>>>>> Copy button code from template
