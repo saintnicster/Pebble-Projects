@@ -8,12 +8,12 @@
         "file":"resource_map.json"
        },
        {
-        "type":"png",
+        "type":"png-trans",
         "defName":"IMAGE_BUTTON_PLUS",
         "file":"images/button_plus.png"
        },
        {
-        "type":"png",
+        "type":"png-trans",
         "defName":"IMAGE_BUTTON_MINUS",
         "file":"images/button_minus.png"
        },
