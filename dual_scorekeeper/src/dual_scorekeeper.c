@@ -10,7 +10,7 @@ PBL_APP_INFO(MY_UUID,
              1, 0, /* App version */
              DEFAULT_MENU_ICON,
              APP_INFO_STANDARD_APP);
-Window window; RotBmpPairContainer button_plus; RotBmpPairContainer button_minus; BmpContainer arrow;
+Window window; BmpContainer button_plus; BmpContainer button_minus; BmpContainer arrow;
 
 struct CommonWordsData {
   int top_counter;
@@ -65,8 +65,8 @@ void toggle_active_counter() {
   }
 
   GRect frame = layer_get_frame( &(arrow.layer).layer);
-  frame.origin.x = 62;
-  frame.origin.y = 62;
+  frame.origin.x = 53;
+  frame.origin.y = 70;
   layer_set_frame( &(arrow.layer.layer), frame);
 
   layer_add_child(&window.layer, &(arrow.layer).layer);
@@ -112,14 +112,14 @@ void click_config_provider(ClickConfig **config, Window *window) {
 }
 
 void init_images() {
-  rotbmp_pair_init_container( RESOURCE_ID_IMAGE_BUTTON_PLUS_WHITE, RESOURCE_ID_IMAGE_BUTTON_PLUS_BLACK, &button_plus);
+  bmp_init_container( RESOURCE_ID_IMAGE_BUTTON_PLUS, &button_plus);
   GRect frame = layer_get_frame( &(button_plus.layer).layer );
   frame.origin.x = 119;
   frame.origin.y = 0;
   layer_set_frame( &(button_plus.layer).layer, frame );
   layer_add_child(&window.layer, &(button_plus.layer).layer);
 
-  rotbmp_pair_init_container( RESOURCE_ID_IMAGE_BUTTON_MINUS_WHITE, RESOURCE_ID_IMAGE_BUTTON_MINUS_BLACK, &button_minus);
+  bmp_init_container( RESOURCE_ID_IMAGE_BUTTON_MINUS, &button_minus);
   frame = layer_get_frame( &(button_minus.layer).layer);
   frame.origin.x = 118;
   frame.origin.y = 127;
@@ -130,8 +130,8 @@ void init_images() {
 void handle_deinit(AppContextRef ctx) {
   (void)ctx;
   
-  rotbmp_pair_deinit_container(&button_plus);
-  rotbmp_pair_deinit_container(&button_minus);
+  bmp_deinit_container(&button_plus);
+  bmp_deinit_container(&button_minus);
   bmp_deinit_container(&arrow);
 }
 void init_counter_label(Window window, TextLayer *layer, GRect frame) {
@@ -142,7 +142,7 @@ void init_counter_label(Window window, TextLayer *layer, GRect frame) {
   text_layer_set_text_color( layer, GColorWhite );
   text_layer_set_font( layer, fonts_get_system_font(FONT_KEY_GOTHAM_42_BOLD) );
 
-  //layer_add_child(&window.layer, &(*layer).layer );
+  layer_add_child(&window.layer, &(*layer).layer );
 }
 
 void handle_init(AppContextRef ctx) {
@@ -159,13 +159,11 @@ void handle_init(AppContextRef ctx) {
   
   init_images();
 
-  init_counter_label( window, &s_data.top_counter_label, GRect(10,15,124,50) );
-  init_counter_label( window, &s_data.bottom_counter_label, GRect(10,92,124,50) );
+  init_counter_label( window, &s_data.top_counter_label, GRect(10,15,107,46) );
+  init_counter_label( window, &s_data.bottom_counter_label, GRect(10,92,107,50) );
+
   refresh_labels();
 
-
-  layer_add_child(&window.layer, &s_data.top_counter_label.layer);
-  layer_add_child(&window.layer, &s_data.bottom_counter_label.layer);
   toggle_active_counter();
 }
 void pbl_main(void *params) {
