@@ -5,10 +5,11 @@
 #define ARROW_UP_ID 1
 #define ARROW_DOWN_ID 2
 #define MY_UUID { 0xC7, 0xE2, 0xF4, 0x51, 0xF5, 0x05, 0x49, 0x2C, 0x8F, 0x53, 0x33, 0x28, 0x32, 0xB6, 0x67, 0x78 }
+
 PBL_APP_INFO(MY_UUID,
              "Scorekeeper", "Nick Fajardo",
              1, 0, /* App version */
-             DEFAULT_MENU_ICON,
+             RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_STANDARD_APP);
 Window window; BmpContainer button_plus; BmpContainer button_minus; BmpContainer arrow;
 

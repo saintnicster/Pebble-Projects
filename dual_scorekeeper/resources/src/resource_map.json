@@ -26,6 +26,11 @@
         "type":"png",
         "defName":"IMAGE_ARROW_DOWN",
         "file":"images/arrow_down.png"
+       },
+       {
+        "type":"png",
+        "defName": "IMAGE_MENU_ICON",
+        "file":"images/icon.png"
        }
       ]
 }
