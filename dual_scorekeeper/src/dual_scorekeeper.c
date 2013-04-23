@@ -6,7 +6,7 @@
 #define ARROW_DOWN_ID 2
 #define MY_UUID { 0xC7, 0xE2, 0xF4, 0x51, 0xF5, 0x05, 0x49, 0x2C, 0x8F, 0x53, 0x33, 0x28, 0x32, 0xB6, 0x67, 0x78 }
 PBL_APP_INFO(MY_UUID,
-             "Dual Scorekeeper", "Nick Fajardo",
+             "Scorekeeper", "Nick Fajardo",
              1, 0, /* App version */
              DEFAULT_MENU_ICON,
              APP_INFO_STANDARD_APP);
@@ -18,6 +18,7 @@ struct CommonWordsData {
   int arrow_direction;
   TextLayer top_counter_label;
   TextLayer bottom_counter_label;
+  TextLayer blank_layer;
   char top_counter_text[10];
   char bottom_counter_text[10];
 } s_data;
@@ -45,10 +46,10 @@ void decrement_counter() {
     counter = &s_data.bottom_counter;
   }
 
-  if (*counter + 1 < -9999) {
+  if (*counter - 1 < -9999) {
     *counter = -9999;
   } else {
-    *counter-= 1;
+    *counter -= 1;
   }
 }
 
@@ -95,7 +96,8 @@ void select_single_click_handler(ClickRecognizerRef recognizer, Window *window) 
 }
 void select_long_click_handler(ClickRecognizerRef recognizer, Window *window) {
   (void)recognizer; (void)window;
-  s_data.top_counter=9999; s_data.bottom_counter=-9999; refresh_labels();
+  s_data.top_counter=0; s_data.bottom_counter=0;
+  refresh_labels();
 }
 void click_config_provider(ClickConfig **config, Window *window) {
   (void)window;
@@ -159,10 +161,14 @@ void handle_init(AppContextRef ctx) {
   
   init_images();
 
-  init_counter_label( window, &s_data.top_counter_label, GRect(10,15,107,46) );
-  init_counter_label( window, &s_data.bottom_counter_label, GRect(10,92,107,50) );
+  init_counter_label( window, &s_data.top_counter_label, GRect(0,15,125,46) );
+  init_counter_label( window, &s_data.bottom_counter_label, GRect(0,94,125,50) );
 
   refresh_labels();
+
+  text_layer_init( &s_data.blank_layer, GRect(0, 63, 144, 37) );
+  text_layer_set_background_color( &s_data.blank_layer, GColorWhite );
+  layer_add_child( &window.layer, &s_data.blank_layer.layer );
 
   toggle_active_counter();
 }
