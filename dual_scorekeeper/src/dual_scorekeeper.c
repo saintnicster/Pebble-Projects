@@ -143,7 +143,7 @@ void init_counter_label(Window window, TextLayer *layer, GRect frame) {
   text_layer_set_text_alignment( layer, GTextAlignmentCenter );
   text_layer_set_background_color( layer, GColorBlack );
   text_layer_set_text_color( layer, GColorWhite );
-  text_layer_set_font( layer, fonts_get_system_font(FONT_KEY_GOTHAM_42_BOLD) );
+  text_layer_set_font( layer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD) );
 
   layer_add_child(&window.layer, &(*layer).layer );
 }
