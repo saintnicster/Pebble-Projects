@@ -1,7 +1,6 @@
 #include "pebble_os.h"
 #include "pebble_app.h"
 #include "pebble_fonts.h"
-#include "mini-printf.h"
 #define ARROW_UP_ID 1
 #define ARROW_DOWN_ID 2
 #define MY_UUID { 0xC7, 0xE2, 0xF4, 0x51, 0xF5, 0x05, 0x49, 0x2C, 0x8F, 0x53, 0x33, 0x28, 0x32, 0xB6, 0x67, 0x78 }
@@ -75,10 +74,10 @@ void toggle_active_counter() {
 }
 
 void refresh_labels() {
-  mini_snprintf(s_data.top_counter_text, 10, "%d", s_data.top_counter);
+  snprintf(s_data.top_counter_text, 10, "%d", s_data.top_counter);
   text_layer_set_text(&s_data.top_counter_label, s_data.top_counter_text);
-
-  mini_snprintf(s_data.bottom_counter_text, 10, "%d", s_data.bottom_counter);
+  
+  snprintf(s_data.bottom_counter_text, 10, "%d", s_data.bottom_counter);
   text_layer_set_text(&s_data.bottom_counter_label, s_data.bottom_counter_text);
 }
 
