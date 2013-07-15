@@ -56,6 +56,9 @@ void toggle_selected_layer() {
       selected   = &s_data.selector_hundred;
       unselected = &s_data.selector_ten;
       break;
+    default:
+      return;
+      break;
   }
   if (selected) {
     text_layer_set_background_color(selected, GColorWhite);
@@ -168,7 +171,7 @@ void handle_init(AppContextRef ctx) {
   layer_add_child(&window.layer, &button_bar.layer.layer);
 
   text_layer_init(&s_data.counter_label, GRect(0,20,144,50));
-  text_layer_set_font(&s_data.counter_label, fonts_get_system_font(FONT_KEY_GOTHAM_42_BOLD));
+  text_layer_set_font(&s_data.counter_label, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
   text_layer_set_text_alignment(&s_data.counter_label, GTextAlignmentCenter);
   text_layer_set_background_color(&s_data.counter_label, GColorBlack);
   text_layer_set_text_color(&s_data.counter_label, GColorWhite);
