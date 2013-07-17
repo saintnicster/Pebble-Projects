@@ -80,8 +80,10 @@ void select_single_click_handler(ClickRecognizerRef recognizer, Window *window) 
 }
 void select_long_click_handler(ClickRecognizerRef recognizer, Window *window) {
   (void)recognizer; (void)window;
-  s_data.count_top=0; s_data.count_bottom=0;
   APP_LOG( APP_LOG_LEVEL_DEBUG, "select_long_click_handler");
+  s_data.count_top=0; s_data.count_bottom=0;
+  refresh_label( &s_data.counter_top_label, &s_data.count_top, s_data.counter_top_text);
+  refresh_label( &s_data.counter_bottom_label, &s_data.count_bottom, s_data.counter_bottom_text);
 }
 
 void set_button_images( ) {
@@ -156,7 +158,7 @@ void init_counter_label(Window window, TextLayer *layer, GRect frame) {
   text_layer_set_text_alignment( layer, GTextAlignmentCenter );
   text_layer_set_background_color( layer, GColorBlack );
   text_layer_set_text_color( layer, GColorWhite );
-  text_layer_set_font( layer, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD) );
+  text_layer_set_font( layer, fonts_get_system_font(FONT_KEY_BITHAM_42_LIGHT) );
 
   layer_add_child(&window.layer, &(*layer).layer );
 }
