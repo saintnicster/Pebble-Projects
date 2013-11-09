@@ -1,0 +1,42 @@
+{
+  "uuid": "381d0bae-f505-492c-8f53-332832b66778",
+  "shortName": "Scorekeeper",
+  "longName": "Scorekeeper",
+  "companyName": "Nick Fajardo",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "watchapp": {
+    "watchface": false
+  },
+  "appKeys": {},
+  "resources": {
+    "media": [
+      {
+        "type": "png",
+        "name": "IMAGE_BUTTON_PLUS",
+        "file": "images/button_plus.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_BUTTON_MINUS",
+        "file": "images/button_minus.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_ARROW_UP",
+        "file": "images/arrow_up.png"
+      },
+      {
+        "type": "png",
+        "name": "IMAGE_ARROW_DOWN",
+        "file": "images/arrow_down.png"
+      },
+      {
+        "menuIcon": true,
+        "type": "png",
+        "name": "IMAGE_MENU_ICON",
+        "file": "images/icon.png"
+      }
+    ]
+  }
+}
