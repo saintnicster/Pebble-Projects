@@ -8,6 +8,8 @@
 	
 Window *main_window;
 
+Layer       *arrow_bar_layer;
+
 BitmapLayer *button_top_white; 	  BitmapLayer *button_top_black;
 BitmapLayer *button_bottom_white; BitmapLayer *button_bottom_black;
 BitmapLayer *button_arrow;
@@ -33,8 +35,6 @@ void increment_counter() {
 	
 	if (*counter + 1 > 9999)	*counter = 9999;
 	else						*counter+= 1;
-	
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "counter = %u", *counter);
 }
 void decrement_counter() {
 	int *counter;
@@ -43,8 +43,6 @@ void decrement_counter() {
 	
 	if (*counter - 1 < -9999) *counter  = -9999;
 	else                      *counter -= 1;
-	
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "counter = %u", *counter);
 }
 void populate_counter_labels( ) {
 	snprintf( s_data.top_counter_text,    10, "%d", s_data.top_counter    );
@@ -83,8 +81,19 @@ void set_button_arrow( ) {
 	bitmap_layer_set_bitmap(button_arrow, bmp);
 	layer_add_child( window_get_root_layer(main_window), bitmap_layer_get_layer(button_arrow) );
 }
+void update_arrow_bar_layer_bg(struct Layer *layer, GContext *ctx) {
+	graphics_context_set_fill_color  ( ctx, GColorWhite);
+	graphics_context_set_stroke_color( ctx, GColorWhite);
+	graphics_draw_rect               ( ctx, layer_get_bounds(layer)                 );
+	graphics_fill_rect               ( ctx, layer_get_bounds(layer), 0, GCornerNone );
+}
+
 void window_load(Window *window) {
 	Layer *window_layer = window_get_root_layer(window);
+
+	arrow_bar_layer = layer_create(GRect(0, 64, 144, 36));
+	layer_set_update_proc( arrow_bar_layer, (LayerUpdateProc) update_arrow_bar_layer_bg );
+	layer_add_child( window_layer, arrow_bar_layer);
 	
 	bmp_plus_white  = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BUTTON_PLUS_WHITE  );
 	bmp_plus_black  = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_BUTTON_PLUS_BLACK  );
@@ -94,19 +103,19 @@ void window_load(Window *window) {
 	bmp_arrow_up    = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_ARROW_UP   );
 	bmp_arrow_down  = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_ARROW_DOWN );
 
-	button_top_white    = bitmap_layer_create( GRect(119,0,26,26) );
-	button_top_black    = bitmap_layer_create( GRect(119,0,26,26) );
-	button_bottom_white = bitmap_layer_create( GRect(119,127,26,26) );
-	button_bottom_black = bitmap_layer_create( GRect(119,127,26,26) );
+	button_top_white    = bitmap_layer_create( GRect(119, 0,   26, 26) );
+	button_top_black    = bitmap_layer_create( GRect(119, 0,   26, 26) );
+	button_bottom_white = bitmap_layer_create( GRect(119, 127, 26, 26) );
+	button_bottom_black = bitmap_layer_create( GRect(119, 127, 26, 26) );
 	
-	button_arrow = bitmap_layer_create( GRect(53,70, 20, 21) );
+	button_arrow = bitmap_layer_create( GRect(53, 70, 20, 21) );
 	set_button_arrow();
 	
 	set_button_graphic( window_layer, button_top_white,    button_top_black,    bmp_plus_white,  bmp_plus_black  );
 	set_button_graphic( window_layer, button_bottom_white, button_bottom_black, bmp_minus_white, bmp_minus_black );
 	
-	counter_lbl_top    = text_layer_create( GRect(0,15,125,46) );
-	counter_lbl_bottom = text_layer_create( GRect(0,94,125,46) );
+	counter_lbl_top    = text_layer_create( GRect(0, 10,  125, 46) );
+	counter_lbl_bottom = text_layer_create( GRect(0, 100, 125, 46) );
 	init_counter_lbl( window_layer, counter_lbl_top    );
 	init_counter_lbl( window_layer, counter_lbl_bottom );
 	
