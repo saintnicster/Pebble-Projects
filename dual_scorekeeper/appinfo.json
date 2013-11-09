@@ -8,16 +8,15 @@
   "watchapp": {
     "watchface": false
   },
-  "appKeys": {},
   "resources": {
     "media": [
       {
-        "type": "png",
+        "type": "png-trans",
         "name": "IMAGE_BUTTON_PLUS",
         "file": "images/button_plus.png"
       },
       {
-        "type": "png",
+        "type": "png-trans",
         "name": "IMAGE_BUTTON_MINUS",
         "file": "images/button_minus.png"
       },
