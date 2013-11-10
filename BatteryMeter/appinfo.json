@@ -6,7 +6,7 @@
   "versionCode": 1,
   "versionLabel": "0.0.1",
   "watchapp": {
-    "watchface": true
+    "watchface": false
   },
   "resources": {
     "media": []
