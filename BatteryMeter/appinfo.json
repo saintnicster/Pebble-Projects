@@ -1,0 +1,14 @@
+{
+  "uuid": "08e576dc-8b7a-4df0-a42c-c27eda605a9f",
+  "shortName": "BatteryMeter",
+  "longName": "BatteryMeter",
+  "companyName": "Nick Fajardo",
+  "versionCode": 1,
+  "versionLabel": "0.0.1",
+  "watchapp": {
+    "watchface": true
+  },
+  "resources": {
+    "media": []
+  }
+}
