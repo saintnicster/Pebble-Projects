@@ -1,14 +1,22 @@
 #include <pebble.h>
 
-static Window *window;
-static TextLayer *text_layer;
-static Layer *battery_layer;
+Window *window;
+TextLayer *text_layer;
+Layer *battery_layer;
+
+
+uint8_t last_percentage;
+
 void draw_battery_layer(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds( layer );
+  GRect filled_bounds = bounds;
+
+  filled_bounds.size.h   = ((double) filled_bounds.size.h * (last_percentage / 100.0));
+  filled_bounds.origin.y =           bounds.size.h        - filled_bounds.size.h;
   
   graphics_context_set_stroke_color( ctx, GColorBlack );
   graphics_draw_rect               ( ctx, bounds );
-  //graphics_fill_rect               ( ctx, bounds, 0, GCornerNone );
+  graphics_fill_rect               ( ctx, filled_bounds, 0, GCornerNone );
 }
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
@@ -33,8 +41,13 @@ static void window_unload(Window *window) {
 void handle_battery(BatteryChargeState charge_state) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Handling battery state... charge_percent = %d%%, is_charging = %i, is_plugged = %i", charge_state.charge_percent, charge_state.is_charging, charge_state.is_plugged);
   static char level_text[] = "Level - 100%";
+
+  if (last_percentage != charge_state.charge_percent) {
+    last_percentage = charge_state.charge_percent;
+    layer_mark_dirty( battery_layer );
+  }
   
-  snprintf( level_text, sizeof(level_text), "Level - %d%%", charge_state.charge_percent);
+  snprintf( level_text, sizeof(level_text), "Level - %d%%", last_percentage);
   APP_LOG(APP_LOG_LEVEL_DEBUG, "%s", level_text);
   text_layer_set_text( text_layer,  level_text );
 }
