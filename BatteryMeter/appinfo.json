@@ -3,12 +3,18 @@
   "shortName": "BatteryMeter",
   "longName": "BatteryMeter",
   "companyName": "Nick Fajardo",
-  "versionCode": 1,
-  "versionLabel": "0.0.1",
+  "versionCode": 10,
+  "versionLabel": "0.0.5",
   "watchapp": {
     "watchface": false
   },
   "resources": {
-    "media": []
+    "media": [
+      {
+        "type": "png-trans",
+        "name": "IMAGE_USB",
+        "file": "images/USB_Icon.png"
+      }
+    ]
   }
 }

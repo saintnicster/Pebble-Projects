@@ -1,11 +1,40 @@
 #include <pebble.h>
 
-Window *window;
-TextLayer *text_layer;
-Layer *battery_layer;
-
+Window      *window;
+TextLayer   *layer_text;
+Layer       *layer_battery;
+BitmapLayer *layer_usb_white;
+BitmapLayer *layer_usb_black;
+GBitmap     *bmp_usb_white;
+GBitmap     *bmp_usb_black;
 
 uint8_t last_percentage;
+int is_charging;
+
+void draw_usb_icon() {
+  if (!bmp_usb_white) {
+    bmp_usb_white = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_USB_WHITE );
+    bmp_usb_black = gbitmap_create_with_resource( RESOURCE_ID_IMAGE_USB_BLACK );
+  }
+  if (!layer_usb_white) {
+    layer_usb_white = bitmap_layer_create( GRect(102, 74, 24, 50) );
+    layer_usb_black = bitmap_layer_create( GRect(102, 74, 24, 50) );
+    bitmap_layer_set_bitmap          ( layer_usb_white,  bmp_usb_white );
+    bitmap_layer_set_compositing_mode( layer_usb_white,  GCompOpOr );
+    bitmap_layer_set_bitmap          ( layer_usb_black,  bmp_usb_black    );
+    bitmap_layer_set_compositing_mode( layer_usb_black,  GCompOpClear );
+  }
+
+  Layer *window_layer = window_get_root_layer( window );
+  layer_add_child                            ( window_layer, bitmap_layer_get_layer(layer_usb_white) );
+  layer_add_child                            ( window_layer, bitmap_layer_get_layer(layer_usb_black) );
+}
+void clear_usb() {
+  if (layer_usb_white) {
+    layer_remove_from_parent( bitmap_layer_get_layer( layer_usb_white ) );
+    layer_remove_from_parent( bitmap_layer_get_layer( layer_usb_black ) );
+  }
+}
 
 void draw_battery_layer(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds( layer );
@@ -22,39 +51,50 @@ static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  text_layer = text_layer_create( GRect(10, 10, bounds.size.w - 20, 50) );
-  text_layer_set_text_alignment ( text_layer,   GTextAlignmentCenter );
-  text_layer_set_font           ( text_layer,   fonts_get_system_font( FONT_KEY_GOTHIC_28 ) );
-  text_layer_set_text           ( text_layer,   "Level - 00%" );
-  text_layer_set_text_color     ( text_layer,   GColorBlack);
-  layer_add_child               ( window_layer, text_layer_get_layer(text_layer) );
 
-  battery_layer = layer_create(GRect(57, 60, 30, 80 ));
-  layer_set_update_proc       (battery_layer, (LayerUpdateProc) draw_battery_layer);
-  layer_add_child( window_layer, battery_layer );
+  layer_text = text_layer_create( GRect(10, 10, bounds.size.w - 20, 50) );
+  text_layer_set_text_alignment ( layer_text,   GTextAlignmentCenter );
+  text_layer_set_font           ( layer_text,   fonts_get_system_font( FONT_KEY_GOTHIC_28 ) );
+  text_layer_set_text           ( layer_text,   "Level - 00%" );
+  text_layer_set_text_color     ( layer_text,   GColorBlack);
+  layer_add_child               ( window_layer, text_layer_get_layer(layer_text) );
+
+  layer_battery = layer_create(GRect(57, 60, 30, 80 ));
+  layer_set_update_proc       (layer_battery, (LayerUpdateProc) draw_battery_layer);
+  layer_add_child( window_layer, layer_battery );
 }
 
 static void window_unload(Window *window) {
-  text_layer_destroy( text_layer );
-  layer_destroy     ( battery_layer );
+
+  if (bmp_usb_white)   gbitmap_destroy     ( bmp_usb_white );
+  if (bmp_usb_black)   gbitmap_destroy     ( bmp_usb_black );
+  if (layer_usb_white) bitmap_layer_destroy( layer_usb_white );
+  if (layer_usb_black) bitmap_layer_destroy( layer_usb_black );
+
+  text_layer_destroy  ( layer_text );
+  layer_destroy       ( layer_battery );
 }
 void handle_battery(BatteryChargeState charge_state) {
+  char time_text[] = "[YYYY-MM-DD 00:00:00]";
+  static char level_text[] = "Level - 100%";
+
   time_t now = time(NULL);
   struct tm *current_time = localtime(&now);
-  char time_text[] = "[YYYY-MM-DD 00:00:00]";
   strftime(time_text, sizeof(time_text), "%Y-%m-%d %T", current_time);
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "%s - Handling battery state... charge_percent = %d%%, is_charging = %i, is_plugged = %i", time_text, charge_state.charge_percent, charge_state.is_charging, charge_state.is_plugged);
 
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "%s - Battery state - percent = %d%%, charging = %i, plugged = %i", time_text, charge_state.charge_percent, charge_state.is_charging, charge_state.is_plugged);
 
-  static char level_text[] = "Level - 100%";
+  is_charging = charge_state.is_charging;
+  if   (charge_state.is_plugged) draw_usb_icon();
+  else clear_usb();
 
   if (last_percentage != charge_state.charge_percent) {
     last_percentage = charge_state.charge_percent;
-    layer_mark_dirty( battery_layer );
+    layer_mark_dirty( layer_battery );
   }
   
   snprintf( level_text, sizeof(level_text), "Level - %d%%", last_percentage);
-  text_layer_set_text( text_layer,  level_text );
+  text_layer_set_text( layer_text,  level_text );
 }
 static void init(void) {
   window = window_create();
