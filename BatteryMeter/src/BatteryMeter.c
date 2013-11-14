@@ -39,7 +39,13 @@ static void window_unload(Window *window) {
   layer_destroy     ( battery_layer );
 }
 void handle_battery(BatteryChargeState charge_state) {
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Handling battery state... charge_percent = %d%%, is_charging = %i, is_plugged = %i", charge_state.charge_percent, charge_state.is_charging, charge_state.is_plugged);
+  time_t now = time(NULL);
+  struct tm *current_time = localtime(&now);
+  char time_text[] = "[YYYY-MM-DD 00:00:00]";
+  strftime(time_text, sizeof(time_text), "%Y-%m-%d %T", current_time);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "%s - Handling battery state... charge_percent = %d%%, is_charging = %i, is_plugged = %i", time_text, charge_state.charge_percent, charge_state.is_charging, charge_state.is_plugged);
+
+
   static char level_text[] = "Level - 100%";
 
   if (last_percentage != charge_state.charge_percent) {
