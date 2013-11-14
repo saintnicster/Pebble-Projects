@@ -54,7 +54,6 @@ void handle_battery(BatteryChargeState charge_state) {
   }
   
   snprintf( level_text, sizeof(level_text), "Level - %d%%", last_percentage);
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "%s", level_text);
   text_layer_set_text( text_layer,  level_text );
 }
 static void init(void) {
