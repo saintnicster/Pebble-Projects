@@ -1,78 +1,69 @@
-#include "pebble_os.h"
-#include "pebble_app.h"
-#include "pebble_fonts.h"
-#include "mini-printf.h"
+#include <pebble.h>
 
 #define ONES_SELECTED 1
 #define TENS_SELECTED 10
 #define HUNDRED_SELECTED 100
 
-#define MY_UUID { 0xE9, 0xFA, 0x71, 0xA1, 0xD0, 0x27, 0x43, 0xB7, 0xAB, 0xE6, 0xFC, 0xE1, 0xB7, 0x1F, 0xCC, 0xC8 }
-PBL_APP_INFO(MY_UUID,
-             "Counter", "Nick Fajardo",
-             1, 0, /* App version */
-             RESOURCE_ID_IMAGE_MENU_ICON,
-             APP_INFO_STANDARD_APP);
+Window       *window;
+GBitmap      *bmp_button_bar;
+BitmapLayer  *layer_button_bar;
 
-Window window;
-BmpContainer button_bar;
+TextLayer *layer_counter; 
+TextLayer *layer_selector_hundred; 
+TextLayer *layer_selector_ten;
+TextLayer *layer_selector_one;
 
-struct CommonWordsData {
-  TextLayer counter_label;
-  TextLayer selector_hundred;
-  TextLayer selector_ten;
-  TextLayer selector_one;
 
+struct CommonData {
   short counter;
-  int selected_digit;
-  char counter_text[10];
+  int   selected_digit;
+  char  counter_text[10];
 } s_data;
 
-void init_selector_layer(Window window, TextLayer *text_layer, GRect frame, char* label) {
-  text_layer_init(text_layer, frame);
+void init_selector_layer(Layer *layer_parent, TextLayer *text_layer, char* label) {
+  text_layer_set_text_alignment  ( text_layer, GTextAlignmentCenter                        );
+  text_layer_set_background_color( text_layer, GColorBlack                                 );
+  text_layer_set_text_color      ( text_layer, GColorWhite                                 );
+  text_layer_set_font            ( text_layer, fonts_get_system_font( FONT_KEY_GOTHIC_28 ) );
+  text_layer_set_text            ( text_layer, label                                       );
 
-  text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
-  text_layer_set_background_color(text_layer, GColorBlack);
-  text_layer_set_text_color(text_layer, GColorWhite);
-  text_layer_set_font(text_layer, fonts_get_system_font(FONT_KEY_GOTHIC_28));
-  text_layer_set_text(text_layer, label);
-
-  layer_add_child(&window.layer, &(*text_layer).layer);
+  layer_add_child(layer_parent, text_layer_get_layer(text_layer));
 }
-
+void set_unselected( TextLayer *text_layer) {
+    text_layer_set_background_color (text_layer, GColorBlack);
+    text_layer_set_text_color       (text_layer, GColorWhite); 
+}
 void toggle_selected_layer() {
   TextLayer *selected;
-  TextLayer *unselected;
+
   switch (s_data.selected_digit) {
     case ONES_SELECTED:
-      selected   = &s_data.selector_one;
-      unselected = &s_data.selector_hundred;
+      selected   = layer_selector_one;
       break;
     case TENS_SELECTED:
-      selected   = &s_data.selector_ten;
-      unselected = &s_data.selector_one;
+      selected   = layer_selector_ten;
       break;
     case HUNDRED_SELECTED:
-      selected   = &s_data.selector_hundred;
-      unselected = &s_data.selector_ten;
+      selected   = layer_selector_hundred;
       break;
     default:
       return;
       break;
   }
+
+  set_unselected( layer_selector_one     );
+  set_unselected( layer_selector_ten     );
+  set_unselected( layer_selector_hundred );
+
   if (selected) {
-    text_layer_set_background_color(selected, GColorWhite);
-    text_layer_set_text_color(selected, GColorBlack);
-  }
-  if (unselected) {
-    text_layer_set_background_color(unselected, GColorBlack);
-    text_layer_set_text_color(unselected, GColorWhite); 
+    text_layer_set_background_color (selected, GColorWhite);
+    text_layer_set_text_color       (selected, GColorBlack);
   }
 }
 
 void set_counter_label_text() {
-  mini_snprintf(s_data.counter_text, 10, "%u", s_data.counter);
-  text_layer_set_text(&s_data.counter_label, s_data.counter_text);
+  snprintf           ( s_data.counter_text, 10, "%i", s_data.counter      );
+  text_layer_set_text( layer_counter,                 s_data.counter_text );
 }
 
 void decrement_counter(short how_much) {
@@ -81,7 +72,6 @@ void decrement_counter(short how_much) {
   } else {
     s_data.counter -= how_much;
   }
-  
 }
 void increment_counter(short how_much) {
   if (s_data.counter + how_much > 9999) {
@@ -93,6 +83,8 @@ void increment_counter(short how_much) {
 
 void reset_counter() {
   s_data.counter = 0;
+
+  s_data.selected_digit = ONES_SELECTED;
 }
 void move_pointer() {
   switch (s_data.selected_digit) {
@@ -110,95 +102,82 @@ void move_pointer() {
   toggle_selected_layer();
 }
 void up_single_click_handler(ClickRecognizerRef recognizer, Window *window) {
-  (void)recognizer;
-  (void)window;
-  
-  increment_counter(s_data.selected_digit);
-  set_counter_label_text();
+  increment_counter( s_data.selected_digit ); set_counter_label_text();
 }
 
-
 void down_single_click_handler(ClickRecognizerRef recognizer, Window *window) {
-  (void)recognizer;
-  (void)window;
-
-  decrement_counter(s_data.selected_digit);
-  set_counter_label_text();
+  decrement_counter( s_data.selected_digit ); set_counter_label_text();
 }
 
 void select_single_click_handler(ClickRecognizerRef recognizer, Window *window) {
-  (void)recognizer;
-  (void)window;
-
-  move_pointer();
-  set_counter_label_text();
+  move_pointer(); 
+}
+void select_long_click_handler_up(ClickRecognizerRef recognizer, Window *window) {
+  toggle_selected_layer(); reset_counter(); set_counter_label_text(); toggle_selected_layer();
 }
 
-
-void select_long_click_handler(ClickRecognizerRef recognizer, Window *window) {
-  (void)recognizer;
-  (void)window;
-
-  reset_counter();
-  set_counter_label_text();
+void click_config_provider(void *context) {
+  window_single_click_subscribe          ( BUTTON_ID_SELECT, (ClickHandler) select_single_click_handler ) ;
+  window_long_click_subscribe            ( BUTTON_ID_SELECT, 500, NULL, (ClickHandler) select_long_click_handler_up );
+  window_single_repeating_click_subscribe( BUTTON_ID_UP,     100, (ClickHandler) up_single_click_handler      );
+  window_single_repeating_click_subscribe( BUTTON_ID_DOWN,   100, (ClickHandler) down_single_click_handler    );
 }
 
-void click_config_provider(ClickConfig **config, Window *window) {
-  (void)window;
+void window_load(Window *window) {
+  Layer *window_layer = window_get_root_layer( window );
+  bmp_button_bar = gbitmap_create_with_resource ( RESOURCE_ID_IMAGE_BUTTON_BAR );
+  
+  layer_button_bar = bitmap_layer_create( (GRect) { .origin = { 0, 0 }, .size = {142, 152} } );
+  bitmap_layer_set_bitmap( layer_button_bar, bmp_button_bar );
+  layer_add_child        ( window_layer, bitmap_layer_get_layer( layer_button_bar ) );
 
-  config[BUTTON_ID_SELECT]->click.handler = (ClickHandler) select_single_click_handler;
+  layer_selector_hundred = text_layer_create( GRect(11, 85, 40, 40) );
+  layer_selector_ten     = text_layer_create( GRect(52, 85, 40, 40) );
+  layer_selector_one     = text_layer_create( GRect(93, 85, 40, 40) );
 
-  config[BUTTON_ID_SELECT]->long_click.handler = (ClickHandler) select_long_click_handler;
+  init_selector_layer( window_layer, layer_selector_hundred, "100" );
+  init_selector_layer( window_layer, layer_selector_ten,     "10"  );
+  init_selector_layer( window_layer, layer_selector_one,     "1"   );
 
-  config[BUTTON_ID_UP]->click.handler = (ClickHandler) up_single_click_handler;
-  config[BUTTON_ID_UP]->click.repeat_interval_ms = 100;
-
-  config[BUTTON_ID_DOWN]->click.handler = (ClickHandler) down_single_click_handler;
-  config[BUTTON_ID_DOWN]->click.repeat_interval_ms = 100;
-}
-
-void handle_init(AppContextRef ctx) {
-  (void)ctx;
-
-  s_data.selected_digit = ONES_SELECTED;
-
-  window_init(&window, "Window Name");
-  window_stack_push(&window, true /* Animated */);
-  window_set_click_config_provider(&window, (ClickConfigProvider) click_config_provider);
-  window_set_background_color(&window, GColorBlack);
-  resource_init_current_app(&COUNTER_IMAGES);
-  bmp_init_container(RESOURCE_ID_IMAGE_BUTTON_BAR, &button_bar);
-  layer_add_child(&window.layer, &button_bar.layer.layer);
-
-  text_layer_init(&s_data.counter_label, GRect(0,20,144,50));
-  text_layer_set_font(&s_data.counter_label, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
-  text_layer_set_text_alignment(&s_data.counter_label, GTextAlignmentCenter);
-  text_layer_set_background_color(&s_data.counter_label, GColorBlack);
-  text_layer_set_text_color(&s_data.counter_label, GColorWhite);
-  layer_add_child(&window.layer, &s_data.counter_label.layer);
-
-  init_selector_layer(window, &s_data.selector_hundred, GRect(11, 85, 40, 40), "100");
-  init_selector_layer(window, &s_data.selector_ten, GRect(52, 85, 40, 40), "10");
-  init_selector_layer(window, &s_data.selector_one, GRect(93, 85, 40, 40), "1");
-
+  layer_counter = text_layer_create( GRect(0,20,144,50) );
+  text_layer_set_font              (layer_counter, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
+  text_layer_set_text_alignment    (layer_counter, GTextAlignmentCenter);
+  text_layer_set_background_color  (layer_counter, GColorBlack);
+  text_layer_set_text_color        (layer_counter, GColorWhite);
+  layer_add_child( window_layer, text_layer_get_layer( layer_counter ) );
 
   toggle_selected_layer();
 
   set_counter_label_text();
 }
+void window_unload( Window *window ) {
+  text_layer_destroy  ( layer_counter          );
+  text_layer_destroy  ( layer_selector_one     );
+  text_layer_destroy  ( layer_selector_ten     );
+  text_layer_destroy  ( layer_selector_hundred );
+  gbitmap_destroy     ( bmp_button_bar         );
+  bitmap_layer_destroy( layer_button_bar       );
+}
+void init() {
+  s_data.selected_digit = ONES_SELECTED;
 
-void handle_deinit(AppContextRef ctx) {
-  (void)ctx;
+  window = window_create();
 
-  // Note: Failure to de-init this here will result in instability and
-  //       unable to allocate memory errors.
-  bmp_deinit_container(&button_bar);
+  window_set_background_color(window, GColorBlack);
+  window_set_click_config_provider( window, click_config_provider);
+  window_set_window_handlers      ( window, (WindowHandlers) {
+    .load = window_load,
+    .unload = window_unload,
+  });
+  window_stack_push(window, true);
 }
 
-void pbl_main(void *params) {
-  PebbleAppHandlers handlers = {
-    .init_handler = &handle_init,
-    .deinit_handler = &handle_deinit
-  };
-  app_event_loop(params, &handlers);
+void deinit() {
+  window_destroy(window);
+}
+
+int main(void) {
+  init          ();
+  app_event_loop();
+  deinit        ();
 }
