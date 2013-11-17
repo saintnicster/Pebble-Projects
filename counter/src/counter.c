@@ -124,8 +124,10 @@ void click_config_provider(void *context) {
 }
 
 void window_load(Window *window) {
+  window_set_background_color(window, GColorBlack);
+
   Layer *window_layer = window_get_root_layer( window );
-  bmp_button_bar = gbitmap_create_with_resource ( RESOURCE_ID_IMAGE_BUTTON_BAR );
+  bmp_button_bar      = gbitmap_create_with_resource ( RESOURCE_ID_IMAGE_BUTTON_BAR );
   
   layer_button_bar = bitmap_layer_create( (GRect) { .origin = { 0, 0 }, .size = {142, 152} } );
   bitmap_layer_set_bitmap( layer_button_bar, bmp_button_bar );
@@ -149,6 +151,7 @@ void window_load(Window *window) {
   toggle_selected_layer();
 
   set_counter_label_text();
+
 }
 void window_unload( Window *window ) {
   text_layer_destroy  ( layer_counter          );
@@ -163,7 +166,6 @@ void init() {
 
   window = window_create();
 
-  window_set_background_color(window, GColorBlack);
   window_set_click_config_provider( window, click_config_provider);
   window_set_window_handlers      ( window, (WindowHandlers) {
     .load = window_load,
@@ -171,7 +173,6 @@ void init() {
   });
   window_stack_push(window, true);
 }
-
 void deinit() {
   window_destroy(window);
 }

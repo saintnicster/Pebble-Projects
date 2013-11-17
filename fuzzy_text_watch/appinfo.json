@@ -1,0 +1,14 @@
+{
+  "uuid": "26de49f2-2800-44b2-893d-be8a61a5b359",
+  "shortName" : "FuzzyTextWatch",
+  "longName"  : "FuzzyTextWatch",
+  "companyName": "Nick Fajardo",
+  "versionCode": 1,
+  "versionLabel": "2.0.0",
+  "watchapp": {
+    "watchface": false
+  },
+  "resources": {
+    "media": [ ]
+  }
+}
