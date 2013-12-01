@@ -3,8 +3,8 @@
   "shortName": "Scorekeeper",
   "longName": "Scorekeeper",
   "companyName": "Nick Fajardo",
-  "versionCode": 10,
-  "versionLabel": "2.0.1",
+  "versionCode": 30,
+  "versionLabel": "2.0.3",
   "watchapp": {
     "watchface": false
   },

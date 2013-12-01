@@ -114,8 +114,8 @@ void window_load(Window *window) {
 	set_button_graphic( window_layer, button_top_white,    button_top_black,    bmp_plus_white,  bmp_plus_black  );
 	set_button_graphic( window_layer, button_bottom_white, button_bottom_black, bmp_minus_white, bmp_minus_black );
 	
-	counter_lbl_top    = text_layer_create( GRect(0, 10,  125, 46) );
-	counter_lbl_bottom = text_layer_create( GRect(0, 100, 125, 46) );
+	counter_lbl_top    = text_layer_create( GRect(0, 10,  124, 46) );
+	counter_lbl_bottom = text_layer_create( GRect(0, 100, 124, 46) );
 	init_counter_lbl( window_layer, counter_lbl_top    );
 	init_counter_lbl( window_layer, counter_lbl_bottom );
 	
@@ -131,44 +131,34 @@ void window_unload( ) {
 	bitmap_layer_destroy( button_top_white    ); bitmap_layer_destroy( button_top_black    );
 	bitmap_layer_destroy( button_bottom_white ); bitmap_layer_destroy( button_bottom_black );
 	bitmap_layer_destroy( button_arrow        );
+
+	layer_destroy( arrow_bar_layer );
 	
 	text_layer_destroy(counter_lbl_top); text_layer_destroy(counter_lbl_bottom);
 }
 void up_single_click_handler(ClickRecognizerRef recognizer, Window *window) {
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "Up button");
 	increment_counter(); populate_counter_labels();
 }
 void down_single_click_handler(ClickRecognizerRef recognizer, Window *window) {
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "Down button");
 	decrement_counter(); populate_counter_labels();
 }
 void select_single_click_handler(ClickRecognizerRef recognizer, Window *window) {
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "Select button (single click)");
 	toggle_counter( ); set_button_arrow( );
 }
-void select_long_click_down_handler(ClickRecognizerRef recognizer, Window *window) {
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "Select button (long click, down)");
-}
 void select_long_click_up_handler(ClickRecognizerRef recognizer, Window *window) {
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "Select button (long click, up)");
-}
-void select_double_click_handler(ClickRecognizerRef recognizer, Window *window) {
-    const uint16_t count = click_number_of_clicks_counted(recognizer);
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "Select button (double click) count:%u", count);
 	s_data.top_counter = 0; s_data.bottom_counter = 0; populate_counter_labels();
 }
 static void click_config_provider(void *context) {
   window_single_repeating_click_subscribe( BUTTON_ID_UP,     100, (ClickHandler) up_single_click_handler         );
   window_single_repeating_click_subscribe( BUTTON_ID_DOWN,   100, (ClickHandler) down_single_click_handler       );
   window_single_click_subscribe          ( BUTTON_ID_SELECT, (ClickHandler) select_single_click_handler          );
-  window_multi_click_subscribe           ( BUTTON_ID_SELECT, 2, 2, 200, true,                                    (ClickHandler) select_double_click_handler  );
-  window_long_click_subscribe            ( BUTTON_ID_SELECT, 500, (ClickHandler) select_long_click_down_handler, (ClickHandler) select_long_click_up_handler );
+  window_long_click_subscribe            ( BUTTON_ID_SELECT, 500, NULL, (ClickHandler) select_long_click_up_handler );
 }
 
 void handle_init( ) {
 	s_data.top_counter     = persist_read_int( PERSIST_KEY_TOP_COUNTER    );
 	s_data.bottom_counter  = persist_read_int( PERSIST_KEY_BOTTOM_COUNTER );
-	
+
 	s_data.arrow_direction = persist_exists( PERSIST_KEY_ARROW ) ? persist_read_int( PERSIST_KEY_ARROW ) : ARROW_UP_ID ;
 	
 	main_window = window_create();
