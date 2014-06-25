@@ -6,7 +6,6 @@
 
 #include "num2words.h"
 #include "string.h"
-#include "pebble_os.h"
 #include <stdbool.h>
 
 static const char* const ONES[] = {
@@ -91,7 +90,7 @@ static size_t append_string(char* buffer, const size_t length, const char* str) 
   return (length > written) ? written : length;
 }
 
-bool time_to_semi_fuzzy_words(int hours, int minutes, char* hour_words, size_t hour_length, char* minute_words, size_t minute_length) {
+bool time_to_semi_fuzzy_words(int hours, int minutes, char* hour_words, size_t hour_length, char* minute_words, size_t minute_length, bool is_24h_style) {
   //Inspiration taken from the original 'fuzzy_time_to_words' method.
   //  There are surely more efficient ways to do this
   int fuzzy_hours = hours;
@@ -144,7 +143,7 @@ bool time_to_semi_fuzzy_words(int hours, int minutes, char* hour_words, size_t h
       remaining_minute -= append_number(minute_words, fuzzy_minutes);
   }
   
-  if ( !clock_is_24h_style() && fuzzy_hours != 12) {
+  if ( !is_24h_style && fuzzy_hours != 12) {
     fuzzy_hours = fuzzy_hours % 12;
   }
   if (fuzzy_hours == 0 && ( is_fuzzy || fuzzy_minutes == 0 ) ) {
